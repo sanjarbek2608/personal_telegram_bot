@@ -5,6 +5,7 @@ Xabarlar uchun handler - Text, Media, Voice
 import logging
 from telegram import Update
 from telegram.ext import ContextTypes
+from telegram.helpers import escape_markdown
 
 from config import TEXTS, ADMIN_CHAT_ID, GROUP_CHAT_ID
 from keyboards import get_back_to_menu_keyboard
@@ -71,11 +72,21 @@ async def handle_user_question(update: Update, context: ContextTypes.DEFAULT_TYP
     
     reply_markup = get_back_to_menu_keyboard()
     
-    await update.message.reply_text(
-        text=response_text,
-        reply_markup=reply_markup,
-        parse_mode='Markdown'
-    )
+    try:
+        await update.message.reply_text(
+            text=response_text,
+            reply_markup=reply_markup,
+            parse_mode='MarkdownV2'  # MarkdownV2 ishlatamiz
+        )
+    except Exception as e:
+        # Agar MarkdownV2 ishlamasa, HTML ishlatamiz
+        logger.warning(f"MarkdownV2 xatolik: {e}, HTML ga o'tamiz")
+        response_text_html = convert_to_html(response_text)
+        await update.message.reply_text(
+            text=response_text_html,
+            reply_markup=reply_markup,
+            parse_mode='HTML'
+        )
     
     # Savol yozish rejimini tugatish
     context.user_data['waiting_for_question'] = False
@@ -124,7 +135,7 @@ def get_content_info(update: Update, content_type: str) -> dict:
     return info
 
 def get_response_text(user_name: str, content_type: str, text_content: str) -> str:
-    """Content type ga qarab javob matnini shakllantirish"""
+    """Content type ga qarab javob matnini shakllantirish (MarkdownV2 format)"""
     content_names = {
         'text': 'matn xabaringiz',
         'photo': 'rasm xabaringiz',
@@ -135,26 +146,45 @@ def get_response_text(user_name: str, content_type: str, text_content: str) -> s
     
     content_name = content_names.get(content_type, 'xabaringiz')
     
+    # MarkdownV2 uchun maxsus belgilarni escape qilish
+    user_name_escaped = escape_markdown(user_name, version=2)
+    content_name_escaped = escape_markdown(content_name, version=2)
+    
     base_text = f"""
-✅ **Savolingiz qabul qilindi!**
+✅ *Savolingiz qabul qilindi\\!*
 
-Hurmatli {user_name}, {content_name} uchun rahmat!
+Hurmatli {user_name_escaped}, savolingiz yuborildi\\!
 """
     
     if text_content:
+        # Matn satrini escape qilish
+        text_escaped = escape_markdown(text_content, version=2)
         base_text += f"""
-📝 **Matn:**
-_{text_content}_
+📝 *Matn:*
+_{text_escaped}_
 """
     
     base_text += """
-⏰ Tez orada sizga javob beriladi. 
-📬 Javob ushbu botda yoki shaxsiy xabar orqali yuboriladi.
+⏰ Tez orada sizga javob beraman\\. 
 
-Boshqa savollaringiz bo'lsa, bemalol yozing! 😊
+Boshqa savollaringiz bo'lsa, bemalol yozing\\! 😊
 """
     
     return base_text
+
+def convert_to_html(markdown_text: str) -> str:
+    """Markdown matnini HTML ga o'girish"""
+    html_text = markdown_text.replace('*', '<b>').replace('*', '</b>')
+    html_text = html_text.replace('_', '<i>').replace('_', '</i>')
+    html_text = html_text.replace('\\!', '!')
+    html_text = html_text.replace('\\.', '.')
+    html_text = html_text.replace('\\-', '-')
+    
+    # HTML formatiga o'girish
+    html_text = html_text.replace('✅ <b>Savolingiz qabul qilindi!</b>', '✅ <b>Savolingiz qabul qilindi!</b>')
+    html_text = html_text.replace('📝 <b>Matn:</b>', '📝 <b>Matn:</b>')
+    
+    return html_text
 
 async def handle_other_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """

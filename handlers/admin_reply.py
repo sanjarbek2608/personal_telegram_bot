@@ -44,29 +44,28 @@ async def admin_reply_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         try:
             await context.bot.send_message(
                 chat_id=user_id,
-                text=f"""
-📬 **Admin javob berdi:**
+                text=f"""📬 <b>Admin javob berdi:</b>
 
 {admin_reply}
 
 ---
 💬 Agar yana savolingiz bo'lsa, botda /start bosib yangi savol yuboring.
 """,
-                parse_mode='Markdown'
+                parse_mode='HTML'
             )
             
             # Guruhda tasdiqlash xabari
             await update.message.reply_text(
-                f"✅ Javob foydalanuvchiga yuborildi!\n👤 User ID: `{user_id}`",
-                parse_mode='Markdown'
+                f"✅ Javob foydalanuvchiga yuborildi!\n👤 User ID: <code>{user_id}</code>",
+                parse_mode='HTML'
             )
             
             logger.info(f"Admin javobi yuborildi - Admin: {update.effective_user.id}, User: {user_id}")
             
         except Exception as e:
             await update.message.reply_text(
-                f"❌ Foydalanuvchiga xabar yuborishda xatolik:\n`{str(e)}`",
-                parse_mode='Markdown'
+                f"❌ Foydalanuvchiga xabar yuborishda xatolik:\n<code>{str(e)}</code>",
+                parse_mode='HTML'
             )
             logger.error(f"Admin javobini yuborishda xatolik: {e}")
             
@@ -88,7 +87,11 @@ def extract_user_id_from_message(message_text: str) -> str:
         r'User ID: `(\d+)`',
         r'User ID: (\d+)',
         r'🆔 \*\*User ID:\*\* `(\d+)`',
-        r'🆔 \*\*User ID:\*\* (\d+)'
+        r'🆔 \*\*User ID:\*\* (\d+)',
+        r'🆔 \*User ID:\* `(\d+)`',  # MarkdownV2 format
+        r'🆔 \*User ID:\* (\d+)',
+        r'<b>User ID:</b> <code>(\d+)</code>',  # HTML format
+        r'<b>User ID:</b> (\d+)'
     ]
     
     for pattern in patterns:

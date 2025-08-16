@@ -26,30 +26,16 @@ Quyidagi tugmalardan birini tanlang:
 """,
     
     'about': """
-👤 **Men haqimda**
 
-Salom! Men [Ismingiz] - Python dasturchi va Telegram bot yaratuvchisiman.
+Assalomu aleykum! Mening ismim: Sanjarbek Xayrulloyev!
 
-🎯 **Faoliyatim:**
-• Python dasturlash
-• Telegram bot yaratish  
-• Web development
-• Ma'lumotlar tahlili
 
-📚 **Ko'nikmalarim:**
-• Python, Django, Flask
-• Telegram Bot API
-• PostgreSQL, MongoDB  
-• Git, Docker
-
-🏆 **Maqsadlarim:**
-Zamonaviy texnologiyalar yordamida foydali botlar va dasturlar yaratish
 """,
     
     'social': """
-📱 **Ijtimoiy tarmoqlarimda kuzatib boring:**
+📱 **Ijtimoiy tarmoqlardagi sahifalarim:**
 
-Quyidagi linklar orqali men bilan bog'laning:
+Quyidagi linklarni bosish orqali sahifalarga o'tishingiz mumkin:
 """,
     
     'question_prompt': """
@@ -88,11 +74,9 @@ Boshqa savollaringiz bo'lsa, bemalol yozing! 😊
 
 # Ijtimoiy tarmoq linklari
 SOCIAL_LINKS = {
-    'telegram': os.getenv("TELEGRAM"),
     'instagram': os.getenv("INSTAGRAM"), 
     'linkedin': os.getenv("LINKEDIN"),
-    'github': os.getenv("GITHUB"),   # agar .env da GITHUB bo‘lsa
-    'youtube': os.getenv("YOUTUBE"), # agar .env da YOUTUBE bo‘lsa
     'facebook': os.getenv("FACEBOOK"),
     'x': os.getenv("X"),
+    'telegram': os.getenv("TELEGRAM"),
 }
