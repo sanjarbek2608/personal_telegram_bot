@@ -18,16 +18,15 @@ async def send_new_user_notification(bot, user):
         return
     
     # Ma'lumotlarni escape qilish
-    first_name = escape_markdown(user.first_name, version=2)
+    first_name = escape_markdown(user.first_name or "Noma'lum", version=2)
     username = f"@{user.username}" if user.username else "mavjud emas"
-    full_name = escape_markdown(user.full_name, version=2)
+    full_name = escape_markdown(user.full_name or "Noma'lum", version=2)
     
     # Vaqt formatini alohida o'zgaruvchiga olish
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     current_time_escaped = escape_markdown(current_time, version=2)
     
-    user_info = f"""
-🆕 *Yangi foydalanuvchi botga start bosdi\\!*
+    user_info = f"""🆕 *Yangi foydalanuvchi botga start bosdi\\!*
 
 👤 *Ism:* {first_name}
 🆔 *User ID:* `{user.id}`
@@ -35,12 +34,11 @@ async def send_new_user_notification(bot, user):
 👤 *To'liq ism:* {full_name}
 🕐 *Vaqt:* {current_time_escaped}
 
-✨ Yangi a'zo qo'shildi\\!
-"""
+✨ Yangi a'zo qo'shildi\\!"""
     
     try:
         await bot.send_message(
-            chat_id=GROUP_CHAT_ID,
+            chat_id=int(GROUP_CHAT_ID),
             text=user_info,
             parse_mode='MarkdownV2'
         )
@@ -50,7 +48,16 @@ async def send_new_user_notification(bot, user):
         logger.error(f"Guruhga yangi foydalanuvchi xabarini yuborishda xatolik: {e}")
         # HTML formatida qayta urinish
         try:
-            user_info_html = convert_markdown_to_html(user_info)
+            user_info_html = f"""🆕 <b>Yangi foydalanuvchi botga start bosdi!</b>
+
+👤 <b>Ism:</b> {user.first_name or "Noma'lum"}
+🆔 <b>User ID:</b> {user.id}
+📱 <b>Username:</b> @{user.username if user.username else "mavjud emas"}
+👤 <b>To'liq ism:</b> {user.full_name or "Noma'lum"}
+🕐 <b>Vaqt:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+✨ Yangi a'zo qo'shildi!"""
+            
             await bot.send_message(
                 chat_id=GROUP_CHAT_ID,
                 text=user_info_html,
@@ -79,7 +86,7 @@ async def send_question_to_group(bot, user, message, content_type, content_info)
     emoji = type_emojis.get(content_type, '📝')
     
     # Ma'lumotlarni escape qilish
-    first_name = escape_markdown(user.first_name, version=2)
+    first_name = escape_markdown(user.first_name or "Noma'lum", version=2)
     username = f"@{user.username}" if user.username else "mavjud emas"
     content_type_title = escape_markdown(content_type.title(), version=2)
     
@@ -88,23 +95,24 @@ async def send_question_to_group(bot, user, message, content_type, content_info)
     current_time_escaped = escape_markdown(current_time, version=2)
     
     # Asosiy xabar matni
-    notification_text = f"""
-{emoji} *Yangi savol keldi\\!*
+    notification_text = f"""{emoji} *Yangi savol keldi\\!*
 
 👤 *Foydalanuvchi:* {first_name}
 🆔 *User ID:* `{user.id}`
 📱 *Username:* {username}
 📊 *Xabar turi:* {content_type_title}
-🕐 *Vaqt:* {current_time_escaped}
-"""
+🕐 *Vaqt:* {current_time_escaped}"""
     
     # Agar matn bo'lsa
     if content_info.get('text'):
-        text_escaped = escape_markdown(content_info['text'], version=2)
+        # Matnni to'g'ri escape qilish
+        text_content = str(content_info['text'])
+        # Maxsus belgilarni escape qilish
+        text_escaped = escape_markdown(text_content, version=2)
         notification_text += f"""
+
 📝 *Savol matni:*
-_{text_escaped}_
-"""
+{text_escaped}"""
     
     # Fayl ma'lumotlari
     if content_info.get('file_info'):
@@ -122,13 +130,13 @@ _{text_escaped}_
             notification_text += f"\n🎤 *Ovozli xabar:* {duration}s davomiyligi"
             
         elif content_type == 'document':
-            file_name = escape_markdown(file_info.get('file_name', 'Fayl'), version=2)
-            notification_text += f"\n📎 *Fayl:* {file_name}"
+            file_name = file_info.get('file_name', 'Fayl')
+            file_name_escaped = escape_markdown(str(file_name), version=2)
+            notification_text += f"\n📎 *Fayl:* {file_name_escaped}"
     
     notification_text += f"""
 
-💬 *Javob berish uchun:* Bu xabarga reply qilib javob yozing
-"""
+💬 *Javob berish uchun:* Bu xabarga reply qilib javob yozing"""
     
     try:
         # Avval matn xabarni yuborish
@@ -147,10 +155,40 @@ _{text_escaped}_
         logger.error(f"Guruhga savol xabarini yuborishda xatolik: {e}")
         # HTML formatida qayta urinish
         try:
-            notification_text_html = convert_markdown_to_html(notification_text)
+            # HTML format
+            html_notification = f"""{emoji} <b>Yangi savol keldi!</b>
+
+👤 <b>Foydalanuvchi:</b> {user.first_name or "Noma'lum"}
+🆔 <b>User ID:</b> {user.id}
+📱 <b>Username:</b> @{user.username if user.username else "mavjud emas"}
+📊 <b>Xabar turi:</b> {content_type.title()}
+🕐 <b>Vaqt:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
+            
+            if content_info.get('text'):
+                html_notification += f"""
+
+📝 <b>Savol matni:</b>
+{content_info['text']}"""
+            
+            if content_info.get('file_info'):
+                file_info = content_info['file_info']
+                if content_type == 'photo':
+                    html_notification += f"\n🖼️ <b>Rasm yuborildi</b>"
+                elif content_type == 'video':
+                    duration = file_info.get('duration', 0)
+                    html_notification += f"\n🎥 <b>Video:</b> {duration}s davomiyligi"
+                elif content_type == 'voice':
+                    duration = file_info.get('duration', 0)
+                    html_notification += f"\n🎤 <b>Ovozli xabar:</b> {duration}s davomiyligi"
+                elif content_type == 'document':
+                    file_name = file_info.get('file_name', 'Fayl')
+                    html_notification += f"\n📎 <b>Fayl:</b> {file_name}"
+            
+            html_notification += f"\n\n💬 <b>Javob berish uchun:</b> Bu xabarga reply qilib javob yozing"
+            
             sent_message = await bot.send_message(
                 chat_id=GROUP_CHAT_ID,
-                text=notification_text_html,
+                text=html_notification,
                 parse_mode='HTML'
             )
             await send_media_to_group(bot, user, content_type, content_info, sent_message.message_id)
@@ -160,11 +198,13 @@ _{text_escaped}_
 async def send_media_to_group(bot, user, content_type, content_info, reply_to_message_id):
     """Media fayllarni guruhga yuborish"""
     try:
+        user_name = user.first_name or "Noma'lum foydalanuvchi"
+        
         if content_type == 'photo' and content_info.get('file_info'):
             await bot.send_photo(
                 chat_id=GROUP_CHAT_ID,
                 photo=content_info['file_info']['file_id'],
-                caption=f"👆 {user.first_name} yuborgan rasm",
+                caption=f"👆 {user_name} yuborgan rasm",
                 reply_to_message_id=reply_to_message_id
             )
             
@@ -172,7 +212,7 @@ async def send_media_to_group(bot, user, content_type, content_info, reply_to_me
             await bot.send_video(
                 chat_id=GROUP_CHAT_ID,
                 video=content_info['file_info']['file_id'],
-                caption=f"👆 {user.first_name} yuborgan video",
+                caption=f"👆 {user_name} yuborgan video",
                 reply_to_message_id=reply_to_message_id
             )
             
@@ -180,7 +220,7 @@ async def send_media_to_group(bot, user, content_type, content_info, reply_to_me
             await bot.send_voice(
                 chat_id=GROUP_CHAT_ID,
                 voice=content_info['file_info']['file_id'],
-                caption=f"👆 {user.first_name} yuborgan ovozli xabar",
+                caption=f"👆 {user_name} yuborgan ovozli xabar",
                 reply_to_message_id=reply_to_message_id
             )
             
@@ -188,29 +228,11 @@ async def send_media_to_group(bot, user, content_type, content_info, reply_to_me
             await bot.send_document(
                 chat_id=GROUP_CHAT_ID,
                 document=content_info['file_info']['file_id'],
-                caption=f"👆 {user.first_name} yuborgan fayl",
+                caption=f"👆 {user_name} yuborgan fayl",
                 reply_to_message_id=reply_to_message_id
             )
     except Exception as e:
         logger.error(f"Media yuborishda xatolik: {e}")
-
-def convert_markdown_to_html(markdown_text: str) -> str:
-    """MarkdownV2 ni HTML ga o'girish"""
-    html_text = markdown_text
-    
-    # Escape qilingan belgilarni tiklash
-    html_text = html_text.replace('\\!', '!')
-    html_text = html_text.replace('\\.', '.')
-    html_text = html_text.replace('\\-', '-')
-    html_text = html_text.replace('\\(', '(')
-    html_text = html_text.replace('\\)', ')')
-    
-    # Markdown formatlarni HTML ga o'girish
-    html_text = html_text.replace('*', '<b>').replace('*', '</b>')
-    html_text = html_text.replace('_', '<i>').replace('_', '</i>')
-    html_text = html_text.replace('`', '<code>').replace('`', '</code>')
-    
-    return html_text
 
 async def send_admin_broadcast_to_group(bot, message):
     """
@@ -220,9 +242,9 @@ async def send_admin_broadcast_to_group(bot, message):
         logger.warning("GROUP_CHAT_ID sozlanmagan")
         return
     
-    message_escaped = escape_markdown(message, version=2)
-    
     try:
+        message_escaped = escape_markdown(str(message), version=2)
+        
         await bot.send_message(
             chat_id=GROUP_CHAT_ID,
             text=f"📢 *Admin e'loni:*\n\n{message_escaped}",
@@ -241,3 +263,19 @@ async def send_admin_broadcast_to_group(bot, message):
             )
         except Exception as e2:
             logger.error(f"HTML formatida ham xatolik: {e2}")
+
+def safe_escape_markdown(text: str) -> str:
+    """
+    Xavfsiz MarkdownV2 escape qilish
+    """
+    if not text:
+        return ""
+    
+    # MarkdownV2 da escape qilinishi kerak bo'lgan belgilar
+    special_chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!']
+    
+    result = str(text)
+    for char in special_chars:
+        result = result.replace(char, f'\\{char}')
+    
+    return result
