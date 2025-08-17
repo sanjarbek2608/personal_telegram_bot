@@ -53,7 +53,7 @@ async def button_callback_handler(update: Update, context: ContextTypes.DEFAULT_
 async def handle_about_callback(query, context: ContextTypes.DEFAULT_TYPE):
     """Men haqimda tugmasi bosilganda"""
     reply_markup = get_back_to_menu_keyboard()
-    
+    logger.info('about tugmasini bosdi')
     await query.edit_message_text(
         text=TEXTS['about'],
         reply_markup=reply_markup,
@@ -63,6 +63,9 @@ async def handle_about_callback(query, context: ContextTypes.DEFAULT_TYPE):
 async def handle_social_callback(query, context: ContextTypes.DEFAULT_TYPE):
     """Ijtimoiy tarmoqlar tugmasi bosilganda"""
     reply_markup = get_social_media_keyboard()
+    
+    logger.info('socials tugmasini bosdi')
+    
     
     await query.edit_message_text(
         text=TEXTS['social'],
@@ -74,6 +77,8 @@ async def handle_question_callback(query, context: ContextTypes.DEFAULT_TYPE):
     """Savol yozish tugmasi bosilganda"""
     # User ni savol yozish rejimiga o'tkazish
     context.user_data['waiting_for_question'] = True
+    
+    logger.info('question tugmasini bosdi')
     
     reply_markup = get_back_to_menu_keyboard()
     

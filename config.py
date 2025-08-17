@@ -41,16 +41,7 @@ Quyidagi linklarni bosish orqali sahifalarga o'tishingiz mumkin:
     'question_prompt': """
 ❓ **Savol yozish**
 
-Menga savolingizni yozing! 
-
-📝 Quyidagi mavzular bo'yicha yordam bera olaman:
-• Python dasturlash
-• Telegram bot yaratish
-• Web development  
-• Texnik masalalar
-• Boshqa IT mavzular
-
-Savolingizni yozing, tez orada javob beraman! 👇
+Menga savolingizni yozing, tez orada javob beraman! 👇
 """,
     
     'question_received': """

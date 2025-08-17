@@ -22,7 +22,7 @@ def get_social_media_keyboard():
     """Ijtimoiy tarmoqlar tugmalari"""
     # SOCIAL_LINKS ni bu yerda import qilish circular import dan saqlanish uchun
     from config import SOCIAL_LINKS
-    
+    print("Ijtimoiy tarmoqlarga kirildi")
     keyboard = []
     
     # Har bir ijtimoiy tarmoq uchun tugma yaratish (faqat link mavjud bo'lsa)
