@@ -55,7 +55,7 @@ _{question}_
 ⏰ Tez orada sizga javob beriladi. 
 📬 Javob ushbu botda yoki shaxsiy xabar orqali yuboriladi.
 
-Boshqa savollaringiz bo'lsa, bemalol yozing! 😊
+Boshqa savollaringiz bo'lsa, /start ni bosing va bemalol yozing! 😊
 """,
 
     'menu_command': """

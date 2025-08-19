@@ -151,7 +151,6 @@ def get_response_text(user_name: str, content_type: str, text_content: str) -> s
     content_name_escaped = escape_markdown(content_name, version=2)
     
     base_text = f"""
-✅ *Savolingiz qabul qilindi\\!*
 
 Hurmatli {user_name_escaped}, savolingiz yuborildi\\!
 """
@@ -167,7 +166,7 @@ _{text_escaped}_
     base_text += """
 ⏰ Tez orada sizga javob beraman\\. 
 
-Boshqa savollaringiz bo'lsa, bemalol yozing\\! 😊
+Boshqa savollaringiz bo'lsa, /start bosing va bemalol yozing\\! 😊
 """
     
     return base_text
