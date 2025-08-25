@@ -27,9 +27,10 @@ Quyidagi tugmalardan birini tanlang:
     
     'about': """
 
-Assalomu aleykum! Mening ismim: Sanjarbek Xayrulloyev!
-
-
+Assalomu aleykum! 
+**Mening ismim: Sanjarbek Xayrulloyev!**
+**Navoiy viloyati, Qiziltepa tumanida tug'ilganman.**
+**Qolgan ma'lumotlar to'ldirilmoqda 🙂**
 """,
     
     'social': """
@@ -52,8 +53,7 @@ Hurmatli {user_name}, savolingiz uchun rahmat!
 📝 **Sizning savolingiz:**
 _{question}_
 
-⏰ Tez orada sizga javob beriladi. 
-📬 Javob ushbu botda yoki shaxsiy xabar orqali yuboriladi.
+⏰ Tez orada sizga javob beraman. 
 
 Boshqa savollaringiz bo'lsa, /start ni bosing va bemalol yozing! 😊
 """,

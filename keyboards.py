@@ -7,7 +7,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 def get_main_menu_keyboard():
     """Asosiy menyu tugmalari"""
     keyboard = [
-        [InlineKeyboardButton("👤 Men haqimda", callback_data='about')],
+        [InlineKeyboardButton("👤 About", callback_data='about')],
         [InlineKeyboardButton("📱 Ijtimoiy tarmoqlar", callback_data='social')],
         [InlineKeyboardButton("❓ Savol yozish", callback_data='question')]
     ]
